@@ -1,0 +1,30 @@
+apiVersion: skaffold/v1beta2
+kind: Config
+build:
+  artifacts:
+  - image: changeme
+    context: .
+    docker: {}
+  tagPolicy:
+    envTemplate:
+      template: '{{.DOCKER_REGISTRY}}/shengwang1028/jenkinsx-learning:{{.VERSION}}'
+  local: {}
+deploy:
+  kubectl: {}
+profiles:
+- name: dev
+  build:
+    artifacts:
+    - docker: {}
+    tagPolicy:
+      envTemplate:
+        template: '{{.DOCKER_REGISTRY}}/shengwang1028/jenkinsx-learning:{{.DIGEST_HEX}}'
+    local: {}
+  deploy:
+    helm:
+      releases:
+      - name: jenkinsx-learning
+        chartPath: charts/jenkinsx-learning
+        setValueTemplates:
+          image.repository: '{{.DOCKER_REGISTRY}}/shengwang1028/jenkinsx-learning'
+          image.tag: '{{.DIGEST_HEX}}'
